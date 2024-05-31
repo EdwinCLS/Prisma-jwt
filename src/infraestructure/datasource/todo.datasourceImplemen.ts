@@ -1,3 +1,4 @@
+import { error } from "node:console";
 import { prisma } from "../../data/postgres";
 import {
   CreateUserDto,
@@ -9,6 +10,10 @@ import {
 
 export class TodoDatasourceImplementation implements UserDatasource {
   async create(createUserDto: CreateUserDto): Promise<registerUser> {
+    const userExist = await prisma.usuario.findFirst({
+      where: { email: createUserDto.email },
+    });
+
     const usuario = await prisma.usuario.create({
       data: createUserDto!,
     });
