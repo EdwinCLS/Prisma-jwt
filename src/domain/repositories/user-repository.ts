@@ -1,6 +1,7 @@
 import { CreateUserDto, UpdateUser } from "../dtos/todos";
 import { registerUser } from "../dtos/todos/entities/user.entity";
 import { updatePass } from "../dtos/todos/update-pass";
+import { loginUser } from "../dtos/todos/login-user";
 
 export abstract class UserRepository {
   abstract create(createUserDto: CreateUserDto): Promise<registerUser>;
@@ -8,4 +9,5 @@ export abstract class UserRepository {
   abstract findById(id: number): Promise<registerUser>;
   abstract updateById(updateUser: UpdateUser): Promise<registerUser>;
   abstract updatePass(UpdatePass: updatePass): Promise<registerUser>;
+  abstract loginAUser(LoginUser: loginUser): Promise<registerUser>;
 }

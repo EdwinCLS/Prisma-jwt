@@ -15,6 +15,7 @@ export class TodoRoutes {
     router.post("/", ControllerUser.createUser);
     router.put("/:id", ControllerUser.updateUser);
     router.put("/:id/upPass", ControllerUser.updatePassword);
+    router.put("/usuario/login", ControllerUser.login);
 
     return router;
   }

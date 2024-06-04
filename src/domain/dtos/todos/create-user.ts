@@ -1,4 +1,4 @@
-import { regularExps } from "../../../config";
+import { bcryptAdapter, regularExps } from "../../../config";
 
 export class CreateUserDto {
   private constructor(
