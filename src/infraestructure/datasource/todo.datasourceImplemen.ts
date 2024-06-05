@@ -16,7 +16,22 @@ export class TodoDatasourceImplementation implements UserDatasource {
   constructor(private readonly emailService: EmailService) {}
 
   async validarMail(ValidateEmail: validateEmail): Promise<registerUser> {
-    throw new Error("Method not implemented.");
+    const payload = await JwtAdapter.validateToken(ValidateEmail.accessToken);
+    if (!payload) throw "Token invalido";
+    const { email } = payload as { email: string };
+    if (!email) throw "Token invalido";
+
+    const usuario = await prisma.usuario.findFirst({
+      where: { email },
+    });
+    if (!usuario) throw "Usuario no encontrado";
+
+    usuario.emailValidado = true;
+    const upUser = await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: usuario,
+    });
+    return registerUser.fromObject(upUser);
   }
 
   async loginAUser(LoginUser: loginUser): Promise<registerUser> {
@@ -34,7 +49,12 @@ export class TodoDatasourceImplementation implements UserDatasource {
     // if (!isMatch) throw "Contraseña incorrecta";
 
     const { password, ...RegisterUser } = registerUser.fromObject(login);
-
+    //Generar token
+    const accesstoken = await JwtAdapter.generateToken({
+      id: login.id,
+    });
+    if (!accesstoken) throw "Error while creating JWT";
+    RegisterUser.accessToken = accesstoken as string;
     return RegisterUser as registerUser;
   }
 
@@ -53,7 +73,6 @@ export class TodoDatasourceImplementation implements UserDatasource {
     //Generar token
     const accesstoken = await JwtAdapter.generateToken({
       id: usuario.id,
-      email: usuario.email,
     });
     if (!accesstoken) throw "Error while creating JWT";
 
@@ -102,8 +121,8 @@ export class TodoDatasourceImplementation implements UserDatasource {
       htmlBody: html,
     };
 
-    const isSet = await this.emailService.sendEmail(options);
-    if (!isSet) throw new Error("Error al enviar el email");
+    const isSent = await this.emailService.sendEmail(options);
+    if (!isSent) throw new Error("Error al enviar el email");
     return true;
   };
 }

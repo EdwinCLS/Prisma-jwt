@@ -87,7 +87,6 @@ export class Controller {
   public ValidateEmailLin = (req: Request, res: Response) => {
     const { token } = req.params;
     const [error, validarEmail] = validateEmail.create({
-      ...req.body,
       token,
     });
     if (error) return res.status(400).json({ error });

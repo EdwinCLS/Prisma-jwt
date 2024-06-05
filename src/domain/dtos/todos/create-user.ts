@@ -4,11 +4,12 @@ export class CreateUserDto {
   private constructor(
     public readonly name: string,
     public readonly email: string,
-    public readonly password: string
+    public readonly password: string,
+    public readonly emailValidado: boolean
   ) {}
 
   static create(props: { [key: string]: any }): [string?, CreateUserDto?] {
-    const { name, email, password } = props;
+    const { name, email, password, emailValidado } = props;
 
     if (!name) return ["El nombre no es válido", undefined];
 
@@ -19,6 +20,6 @@ export class CreateUserDto {
     if (password.length < 6)
       return ["La contraseña debe contener al menos 6 caracteres", undefined];
 
-    return [undefined, new CreateUserDto(name, email, password)];
+    return [undefined, new CreateUserDto(name, email, password, emailValidado)];
   }
 }

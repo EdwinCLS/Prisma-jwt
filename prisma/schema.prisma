@@ -19,6 +19,7 @@ model usuario {
   email String  @unique
   name  String?
   password String
+  emailValidado Boolean
 }
 
 model perfilUser {
