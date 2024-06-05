@@ -1,15 +1,16 @@
 import { loginUser } from "../dtos/todos";
 import { registerUser } from "../dtos/todos/entities/user.entity";
+import { validateEmail } from "../dtos/todos/validate-email";
 import { UserRepository } from "../repositories/user-repository";
 
 export interface LogUserInterface {
-  execute(dtos: loginUser): Promise<registerUser>;
+  execute(dtos: validateEmail): Promise<registerUser>;
 }
 
-export class Loginauser implements LogUserInterface {
+export class ValidateEmailLink implements LogUserInterface {
   constructor(private readonly repository: UserRepository) {}
 
-  execute(dtos: loginUser): Promise<registerUser> {
-    return this.repository.loginAUser(dtos);
+  execute(dtos: validateEmail): Promise<registerUser> {
+    return this.repository.validateEmail(dtos);
   }
 }

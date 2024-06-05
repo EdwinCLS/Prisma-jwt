@@ -1,5 +1,5 @@
 import { access } from "fs";
-import { JwtAdapter, bcryptAdapter } from "../../config";
+import { JwtAdapter, bcryptAdapter, envs } from "../../config";
 import { prisma } from "../../data/postgres";
 import {
   CreateUserDto,
@@ -9,8 +9,16 @@ import {
   registerUser,
   updatePass,
 } from "../../domain";
+import { EmailService } from "../email.service";
+import { validateEmail } from "../../domain/dtos/todos/validate-email";
 
 export class TodoDatasourceImplementation implements UserDatasource {
+  constructor(private readonly emailService: EmailService) {}
+
+  async validarMail(ValidateEmail: validateEmail): Promise<registerUser> {
+    throw new Error("Method not implemented.");
+  }
+
   async loginAUser(LoginUser: loginUser): Promise<registerUser> {
     const login = await prisma.usuario.findFirst({
       where: { email: LoginUser.email },
@@ -24,26 +32,32 @@ export class TodoDatasourceImplementation implements UserDatasource {
 
     // const isMatch = bcryptAdapter.compare(LoginUser.password, login.password);
     // if (!isMatch) throw "Contraseña incorrecta";
-    const accessToken = JwtAdapter.generateToken({
-      id: login.id,
-      email: login.email,
-    });
 
     const { password, ...RegisterUser } = registerUser.fromObject(login);
-    //const token = JwtAdapter.generateToken({ id: login.id });
 
     return RegisterUser as registerUser;
   }
+
   async create(createUserDto: CreateUserDto): Promise<registerUser> {
     const Userexist = await prisma.usuario.findFirst({
       where: { email: createUserDto.email },
     });
     if (Userexist) throw "El usuario ya existe";
 
-    //usuario.password = bcryptAdapter.hash(createUserDto.password);
     const usuario = await prisma.usuario.create({ data: createUserDto! });
 
+    //Email para la verificación
+    await this.sendEmailValidation(usuario.email);
+
     const { password, ...registerUSER } = registerUser.fromObject(usuario);
+    //Generar token
+    const accesstoken = await JwtAdapter.generateToken({
+      id: usuario.id,
+      email: usuario.email,
+    });
+    if (!accesstoken) throw "Error while creating JWT";
+
+    registerUSER.accessToken = accesstoken as string;
 
     return registerUSER as registerUser;
   }
@@ -72,4 +86,24 @@ export class TodoDatasourceImplementation implements UserDatasource {
 
     return registerUser.fromObject(updatePass);
   }
+
+  private sendEmailValidation = async (email: string) => {
+    const token = await JwtAdapter.generateToken({ email });
+    if (!token) throw "Error al generar el token";
+
+    const link = `${envs.WEBSERVICE_URL}/api/user/validate/${token}`;
+    const html = `<h1> Email validado</h1>
+<p> Da click en el link para validar tu email </p>
+<a href: " ${link} "> Valida tu email: ${email} </a>`;
+
+    const options = {
+      to: email,
+      subject: "Validacion de email",
+      htmlBody: html,
+    };
+
+    const isSet = await this.emailService.sendEmail(options);
+    if (!isSet) throw new Error("Error al enviar el email");
+    return true;
+  };
 }

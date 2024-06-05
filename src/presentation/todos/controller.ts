@@ -13,7 +13,10 @@ import {
   createTodos,
   createuser,
 } from "../../domain";
-import { Loginauser } from "../../domain/use-cases/login-user";
+import { Loginauser } from "../../domain/use-cases/todo/login-user";
+import { JwtAdapter } from "../../config";
+import { validateEmail } from "../../domain/dtos/todos/validate-email";
+import { ValidateEmailLink } from "../../domain/use-cases/validate-email";
 
 export class Controller {
   constructor(private readonly userRepository: UserRepository) {}
@@ -79,5 +82,19 @@ export class Controller {
     // });
 
     // findEmail ? res.json(findEmail) : res.json("error");
+  };
+
+  public ValidateEmailLin = (req: Request, res: Response) => {
+    const { token } = req.params;
+    const [error, validarEmail] = validateEmail.create({
+      ...req.body,
+      token,
+    });
+    if (error) return res.status(400).json({ error });
+
+    new ValidateEmailLink(this.userRepository)
+      .execute(validarEmail!)
+      .then((user) => res.json(user))
+      .catch((error) => res.status(400).json({ error }));
   };
 }

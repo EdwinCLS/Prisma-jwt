@@ -7,9 +7,13 @@ import {
   registerUser,
   updatePass,
 } from "../../../domain";
+import { validateEmail } from "../../../domain/dtos/todos/validate-email";
 
 export class TodoRepositoryImpl implements UserRepository {
   constructor(private readonly datasource: UserDatasource) {}
+  validateEmail(validarEmail: validateEmail): Promise<registerUser> {
+    return this.datasource.validarMail(validarEmail);
+  }
 
   loginAUser(LoginUser: loginUser): Promise<registerUser> {
     return this.datasource.loginAUser(LoginUser);
