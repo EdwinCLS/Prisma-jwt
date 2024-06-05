@@ -5,4 +5,4 @@ steps:
   args: ['run', 'build']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy', 'app.yaml']
-logsBucket: gs://your-logs-bucket-name
+logsBucket: gs://logs-build-back-gestionsantiagogonzalezdS
