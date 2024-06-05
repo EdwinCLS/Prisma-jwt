@@ -1,8 +1,41 @@
+postgres/
 
-
+# Node modules
 node_modules/
+
+# Environment variables
 keys/
 .env
 
+# Logs
+logs
+*.log
+npm-debug.log*
 
-postgres/
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Prisma
+prisma/dev.db
+prisma/migrations/
+prisma/generated/
+
+# Typescript
+dist/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+
+# IDE and editor files
+.vscode/
+.idea/
+
+# Build artifacts
+build/
+*.build
+
+# Miscellaneous
+tmp/
+temp/
