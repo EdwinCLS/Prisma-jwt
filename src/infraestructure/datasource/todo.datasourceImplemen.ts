@@ -96,7 +96,7 @@ export class TodoDatasourceImplementation implements UserDatasource {
     const html = `<h1> Email validado</h1> 
     <p> Da click en el link para validar tu email </p>
     <p> Valida tu email: </p>
-    <p><a href="${link}">${email}</a></p>`;
+    <p><a href="${link}">Presione aquí para validar tu email</a></p>`;
 
     const options = {
       to: email,
