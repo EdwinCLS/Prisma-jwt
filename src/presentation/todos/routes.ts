@@ -23,7 +23,7 @@ export class TodoRoutes {
     router.put("/:id", ControllerUser.updateUser);
     router.put("/:id/upPass", ControllerUser.updatePassword);
     router.put("/usuario/login", ControllerUser.login);
-    router.put("/api/user/validate/:token", ControllerUser.ValidateEmailLin);
+    router.get("/api/user/validate/:token", ControllerUser.ValidateEmailLin);
 
     return router;
   }

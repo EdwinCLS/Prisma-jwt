@@ -41,6 +41,19 @@ export class Controller {
       .catch((error) => res.status(400).json({ error }));
   };
 
+  public ValidateEmailLin = (req: Request, res: Response) => {
+    const accessToken = req.params;
+
+    const [error, validarEmail] = validateEmail.create({ accessToken });
+
+    if (error) return res.status(400).json({ error });
+
+    new ValidateEmailLink(this.userRepository)
+      .execute(validarEmail!)
+      .then((user) => res.json(user))
+      .catch((error) => res.status(400).json({ error }));
+  };
+
   public updateUser = (req: Request, res: Response) => {
     const id = +req.params.id;
     const [error, updateUser] = UpdateUser.create({
@@ -82,18 +95,5 @@ export class Controller {
     // });
 
     // findEmail ? res.json(findEmail) : res.json("error");
-  };
-
-  public ValidateEmailLin = (req: Request, res: Response) => {
-    const { token } = req.params;
-    const [error, validarEmail] = validateEmail.create({
-      token,
-    });
-    if (error) return res.status(400).json({ error });
-
-    new ValidateEmailLink(this.userRepository)
-      .execute(validarEmail!)
-      .then((user) => res.json(user))
-      .catch((error) => res.status(400).json({ error }));
   };
 }
