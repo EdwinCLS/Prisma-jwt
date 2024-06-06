@@ -1,6 +1,7 @@
 import { access } from "fs";
 import { JwtAdapter, bcryptAdapter, envs } from "../../config";
 import { prisma } from "../../data/postgres";
+const { query } = require("express-validator");
 import {
   CreateUserDto,
   UpdateUser,
@@ -14,25 +15,6 @@ import { validateEmail } from "../../domain/dtos/todos/validate-email";
 
 export class TodoDatasourceImplementation implements UserDatasource {
   constructor(private readonly emailService: EmailService) {}
-
-  async validarMail(ValidateEmail: validateEmail): Promise<registerUser> {
-    const payload = await JwtAdapter.validateToken(ValidateEmail.accessToken);
-    if (!payload) throw "Token invalido";
-    const { email } = payload as { email: string };
-    if (!email) throw "Token invalido";
-
-    const usuario = await prisma.usuario.findFirst({
-      where: { email },
-    });
-    if (!usuario) throw "Usuario no encontrado";
-
-    usuario.emailValidado = true;
-    const upUser = await prisma.usuario.update({
-      where: { id: usuario.id },
-      data: usuario,
-    });
-    return registerUser.fromObject(upUser);
-  }
 
   async loginAUser(LoginUser: loginUser): Promise<registerUser> {
     const login = await prisma.usuario.findFirst({
@@ -110,10 +92,11 @@ export class TodoDatasourceImplementation implements UserDatasource {
     const token = await JwtAdapter.generateToken({ email });
     if (!token) throw "Error al generar el token";
 
-    const link = `${envs.WEBSERVICE_URL}/api/user/validate/${token}`;
-    const html = `<h1> Email validado</h1>
-<p> Da click en el link para validar tu email </p>
-<a href: " ${link} "> Valida tu email: ${email} </a>`;
+    const link = `${envs.WEBSERVICE_URL}/todos/api/user/validate/${token}`;
+    const html = `<h1> Email validado</h1> 
+    <p> Da click en el link para validar tu email </p>
+    <p> Valida tu email: </p>
+    <p><a href="${link}">${email}</a></p>`;
 
     const options = {
       to: email,
@@ -125,4 +108,25 @@ export class TodoDatasourceImplementation implements UserDatasource {
     if (!isSent) throw new Error("Error al enviar el email");
     return true;
   };
+
+  async validarMail(ValidateEmail: validateEmail): Promise<registerUser> {
+    const { accessToken } = ValidateEmail;
+
+    const payload = await JwtAdapter.validateToken(accessToken);
+    if (!payload) throw "Token invalido";
+    const { email } = payload as { email: string };
+    if (!email) throw "Email invalido";
+
+    const usuario = await prisma.usuario.findFirst({
+      where: { email },
+    });
+    if (!usuario) throw "Usuario no encontrado";
+
+    usuario.emailValidado = true;
+    const upUser = await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: usuario,
+    });
+    return registerUser.fromObject(upUser);
+  }
 }
