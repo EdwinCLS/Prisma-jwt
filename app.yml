@@ -1,11 +1,11 @@
-# service: service-back-santigogonzalez
-# runtime: nodejs18
-# env: standard
-# handlers:
-#   - url: /_next/static
-#     static_dir: .next/static
-#   - url: /.*
-#     script: auto
-# basic_scaling:
-#   idle_timeout: 3m
-#   max_instances: 1
+service: service-back-santigogonzalez
+runtime: nodejs18
+env: standard
+handlers:
+  - url: /_next/static
+    static_dir: .next/static
+  - url: /.*
+    script: auto
+basic_scaling:
+  idle_timeout: 3m
+  max_instances: 1
